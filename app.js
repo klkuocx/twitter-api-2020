@@ -3,11 +3,11 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const express = require('express')
-const db = require('./models')
 const routes = require('./routes')
 const bodyParser = require('body-parser')
 const passport = require('./config/passport')
 const cors = require('cors')
+const WebSockets = require('./utils/WebSockets')
 
 const app = express()
 const port = process.env.PORT
@@ -18,9 +18,13 @@ app.use(bodyParser.json())
 app.use(passport.initialize())
 routes(app)
 
-app.listen(port, () => {
-  db.sequelize.sync()
-  console.log(`Example app listening on http://localhost:${port}`)
+const server = require('http').createServer(app)
+const io = require('socket.io')(server)
+
+io.on('connection', WebSockets.connection)
+
+server.listen(port, () => {
+  console.log(`KRLL Twitter API listening on port:${port}`)
 })
 
 module.exports = app
