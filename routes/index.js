@@ -3,6 +3,7 @@ const admin = require('./admin')
 const users = require('./users')
 const tweets = require('./tweets')
 const followships = require('./followships')
+const chats = require('./chats')
 
 const { authenticate, authAdmin, authUser } = require('../middleware/auth')
 
@@ -12,4 +13,5 @@ module.exports = (app) => {
   app.use('/api/users', authenticate, authUser, users)
   app.use('/api/tweets', authenticate, authUser, tweets)
   app.use('/api/followships', authenticate, authUser, followships)
+  app.use('/api/chats', authenticate, authUser, chats)
 }
