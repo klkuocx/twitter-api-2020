@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {}
   )
-  User.associate = function (models) {
+  User.associate = function(models) {
     User.hasMany(models.Reply)
     User.hasMany(models.Tweet)
     User.hasMany(models.Like)
@@ -28,6 +28,8 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'followerId',
       as: 'Followings'
     })
+    User.hasMany(models.ChatRoom)
+    User.hasMany(models.ChatMessages)
   }
   return User
 }
