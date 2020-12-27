@@ -7,7 +7,7 @@ const routes = require('./routes')
 const bodyParser = require('body-parser')
 const passport = require('./config/passport')
 const cors = require('cors')
-const WebSockets = require('./utils/WebSockets')
+const connection = require('./utils/socket.io')
 
 const app = express()
 const port = process.env.PORT
@@ -21,7 +21,7 @@ routes(app)
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 
-io.on('connection', WebSockets.connection)
+io.on('connection', socket => connection(socket))
 
 server.listen(port, () => {
   console.log(`KRLL Twitter API listening on port:${port}`)
