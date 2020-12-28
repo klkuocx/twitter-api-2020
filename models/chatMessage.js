@@ -8,27 +8,27 @@ module.exports = (sequelize, DataTypes) => {
       RoomId: DataTypes.INTEGER
     },
     {
-      createPostInChatRoom: {
-        async function(chatRoomId, content, postedByUser) {
-          try {
-            const post = await this.create({
-              chatRoomId,
-              content,
-              postedByUser
-            })
-            const aggregate = await this.findByPk(post.id)
-            return aggregate
-          } catch (error) {
-            throw error
-          }
-        }
-      }
-    },
-    {
-      markMessageRead: {}
-    },
-    {
-      getRecentConversation: {}
+      //   createPostInChatRoom: {
+      //     async function(chatRoomId, content, postedByUser) {
+      //       try {
+      //         const post = await this.create({
+      //           chatRoomId,
+      //           content,
+      //           postedByUser
+      //         })
+      //         const aggregate = await this.findByPk(post.id)
+      //         return aggregate
+      //       } catch (error) {
+      //         throw error
+      //       }
+      //     }
+      //   }
+      // },
+      // {
+      //   markMessageRead: {}
+      // },
+      // {
+      //   getRecentConversation: {}
     }
   )
   ChatMessages.associate = function(models) {
