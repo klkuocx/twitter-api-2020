@@ -37,19 +37,19 @@ module.exports = (sequelize, DataTypes) => {
       initiateChat: {
         async function(userId, roomId) {
           try {
-            const availableRoom = await this.findOne(include:{
+            const availableRoom = await this.findOne({include:{
               UserId: { $eq: [userId] },
               RoomId: { $eq: [roomId] }
-            })
+            }})
             if (availableRoom) {
               return {
                 isNew: false,
                 message: 'retrieving an old chat room'
               }
             }
-            const roomCheck = await Room.findOne(include:{
+            const roomCheck = await Room.findOne({include:{
               RoomId: { $eq: [roomId] }
-            })
+            }})
             if (!roomCheck) {
               return {
                 newRoom : await Room.create({roomName: `${userId} chatroom`}),
