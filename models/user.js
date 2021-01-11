@@ -28,8 +28,8 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'followerId',
       as: 'Followings'
     })
-    User.hasMany(models.ChatRoom)
-    User.hasMany(models.ChatMessages)
+    // User.hasMany(models.ChatRoom)
+    // User.hasMany(models.ChatMessages)
   }
   return User
 }
