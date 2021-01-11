@@ -10,6 +10,9 @@ const tweetController = {
   readTweets: (req, res, next) => {
     const userId = helpers.getUser(req).id
     Tweet.findAll({
+      options: {
+        attribute: ['id', 'UserId', 'description', 'createdAt', 'updatedAt']
+      },
       order: [['createdAt', 'DESC']],
       include: [
         { model: User, attributes: ['id', 'account', 'name', 'avatar'] },
@@ -19,12 +22,10 @@ const tweetController = {
     })
       .then(tweets => {
         tweets = tweets.map(tweet => ({
-          ...Object.keys(tweet.dataValues)
-            .slice(0, 6)
-            .reduce((result, key) => {
-              result[key] = tweet[key]
-              return result
-            }, {}),
+          ...Object.keys(tweet.dataValues).reduce((result, key) => {
+            result[key] = tweet[key]
+            return result
+          }, {}),
           isLiked: tweet.Likes.map(l => l.UserId).includes(userId),
           repliedCount: tweet.Replies.length,
           LikeCount: tweet.Likes.length,
@@ -54,6 +55,9 @@ const tweetController = {
     const tweetId = req.params.id
     const userId = helpers.getUser(req).id
     Tweet.findByPk(tweetId, {
+      options: {
+        attribute: ['id', 'UserId', 'description', 'createdAt', 'updatedAt']
+      },
       include: [
         { model: User, attributes: ['id', 'account', 'name', 'avatar'] },
         { model: Reply, attributes: ['UserId'] },
@@ -65,12 +69,10 @@ const tweetController = {
           return res.status(400).json({ message: 'tweet not exist' })
         }
         tweet = {
-          ...Object.keys(tweet.dataValues)
-            .slice(0, 6)
-            .reduce((result, key) => {
-              result[key] = tweet[key]
-              return result
-            }, {}),
+          ...Object.keys(tweet.dataValues).reduce((result, key) => {
+            result[key] = tweet[key]
+            return result
+          }, {}),
           isLiked: tweet.Likes.map(l => l.UserId).includes(userId),
           repliedCount: tweet.Replies.length,
           LikeCount: tweet.Likes.length,
