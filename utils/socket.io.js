@@ -51,5 +51,10 @@ module.exports = io => {
       // send message to all users in public room except sender
       socket.broadcast.to('public room').emit('leaveRoom', `user: ${user.name} is offline`)
     })
+
+    // user is typing
+    socket.on('typing', room => {
+      socket.broadcast.to(room).emit('typing', `user: ${user.name} is typing`)
+    })
   })
 }
