@@ -1,55 +1,70 @@
+// require middleware
+const { authenticateBySocket } = require('../middleware/auth')
+
+// define socket related variable
+/* onlineUsers = {
+  1: {
+    socketId: Set {sk1, sk2},
+    user: {
+      id: 1,
+      account: @user1,
+      name: user1,
+      ...
+    }
+  }
+} */
+const onlineUsers = {}
+
 module.exports = io => {
-  io.on('connection', (socket) => {
-    console.log('socket.io is connecting...')
-    // define chatroom variables
-    const users = {}
-    const typers = {}
+  // authenticate and get user
+  io.use(authenticateBySocket).on('connection', socket => {
+    const user = socket.request.user
+    console.log(`user(socket.id: ${socket.id}, userId: ${user.id}, name: ${user.name}) is connecting`)
 
-    // on connection status
-    socket.on('connect', (userId) => {
-      users[socket.id] = {
-        socketId: socket.id,
-        userId: userId
+    // join public room and add to onlineUsers
+    socket.join('public room')
+    if (Object.keys(onlineUsers).includes(user.id)) {
+      onlineUsers[user.id].socketIds.add(socket.id)
+    } else {
+      onlineUsers[user.id] = {
+        socketIds: new Set(),
+        user: user
       }
-      socket.broadcast.emit('connect', users[socket.id])
+    }
+    // update onlineUsers to frontend
+    io.emit('onlineUsers', {
+      onlineUsers: onlineUsers,
+      countOfUsers: Object.keys(onlineUsers).length
     })
+    // send message to all users in public room except sender
+    socket.broadcast.to('public room').emit('joinRoom', `user: ${user.name} is online`)
 
+    // disconnect and leave public room
     socket.on('disconnect', () => {
-      delete users[socket.id]
-    })
-
-    // on room events
-    socket.on('join', (room) => {
-      socket.join(room)
-      socket.to(room).emit('a new user has joined the room')
-    })
-
-    socket.on('leave', (room) => {
-      socket.leave(room)
-      socket.to(room).emit(`user ${socket.id} has left the room`)
-    })
-
-    // on message events
-    socket.on('typing', (room) => {
-      typers[socket.id] = 1
-      socket.broadcast.to(room).emit('typing', {
-        user: users[socket.id],
-        typers: Object.keys(typers).length
+      // remove socket.id from onlineUsers
+      onlineUsers[user.id].socketIds.delete(socket.id)
+      // update onlineUsers to frontend
+      io.emit('onlineUsers', {
+        onlineUsers: onlineUsers,
+        countOfUsers: Object.keys(onlineUsers).length
       })
+      // send message to all users in public room except sender
+      socket.broadcast.to('public room').emit('leaveRoom', `user: ${user.name} is offline`)
     })
 
-    socket.on('stopped typing', (room) => {
-      delete typers[socket.id]
-      socket.broadcast.to(room).emit('stopped typing', Object.keys(typers).length)
-    })
-
-    socket.on('send message', (room, user, message) => {
-      delete typers[socket.id]
-      socket.broadcast.to(room).emit('send message', {
+    // user send message
+    socket.on('clientSendMessage', message => {
+      if (!message) return
+      io.in('public room').emit('serverSendMessage', {
         user: user,
         message: message,
-        typers: Object.keys(typers).length
+        timestamp: new Date()
       })
+    })
+
+    // user is typing
+    socket.on('typing', room => {
+      socket.broadcast.to(room).emit('typing', `user: ${user.name} is typing`)
     })
   })
 }

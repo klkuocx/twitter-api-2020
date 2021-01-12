@@ -10,6 +10,16 @@ module.exports = {
       return next()
     })(req, res, next)
   },
+
+  authenticateBySocket: (socket, next) => {
+    passport.authenticate('jwt', { session: false }, (err, user, info) => {
+      if (err) return next(err)
+      if (!user) return res.status(401).json({ message: info.message })
+      socket.request.user = user
+      return next()
+    })(socket.request, {}, next)
+  },
+
   authAdmin: (req, res, next) => {
     const user = helpers.getUser(req)
     if (user) {
@@ -18,6 +28,7 @@ module.exports = {
     }
     return res.status(403).json({ message: 'permission denied' })
   },
+
   authUser: (req, res, next) => {
     const user = helpers.getUser(req)
     if (user) {
@@ -26,6 +37,7 @@ module.exports = {
     }
     return res.status(403).json({ message: 'permission denied' })
   },
+
   authUserSelf: (req, res, next) => {
     const userSelf = helpers.getUser(req)
     const otherUserId = Number(req.params.id)
