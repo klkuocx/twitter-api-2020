@@ -38,5 +38,18 @@ module.exports = io => {
     })
     // send message to all users in public room except sender
     socket.broadcast.to('public room').emit('joinRoom', `user: ${user.name} is online`)
+
+    // disconnect and leave public room
+    socket.on('disconnect', () => {
+      // remove socket.id from onlineUsers
+      onlineUsers[user.id].socketIds.delete(socket.id)
+      // update onlineUsers to frontend
+      io.emit('onlineUsers', {
+        onlineUsers: onlineUsers,
+        countOfUsers: Object.keys(onlineUsers).length
+      })
+      // send message to all users in public room except sender
+      socket.broadcast.to('public room').emit('leaveRoom', `user: ${user.name} is offline`)
+    })
   })
 }
