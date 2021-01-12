@@ -52,6 +52,16 @@ module.exports = io => {
       socket.broadcast.to('public room').emit('leaveRoom', `user: ${user.name} is offline`)
     })
 
+    // user send message
+    socket.on('clientSendMessage', message => {
+      if (!message) return
+      io.in('public room').emit('serverSendMessage', {
+        user: user,
+        message: message,
+        timestamp: new Date()
+      })
+    })
+
     // user is typing
     socket.on('typing', room => {
       socket.broadcast.to(room).emit('typing', `user: ${user.name} is typing`)
