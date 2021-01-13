@@ -16,11 +16,9 @@ const followshipController = {
       if (followerId === followingId) {
         return res.status(400).json({ message: "Don't be narcissism" })
       }
-      let { follow, created } = await Followship.findOrCreate({
+      let [ follow, created ] = await Followship.findOrCreate({
         where: { followingId, followerId },
         default: { followingId, followerId }
-      }).spread((follow, created) => {
-        return { follow, created }
       })
       if (!created) {
         return res.status(400).json({ message: 'Already Followed' })

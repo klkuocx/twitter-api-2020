@@ -10,7 +10,7 @@ const tweetController = {
   readTweets: async (req, res, next) => {
     try {
       const userId = helpers.getUser(req).id
-      const tweets = await Tweet.findAll({
+      let tweets = await Tweet.findAll({
         options: {
           attribute: ['id', 'UserId', 'description', 'createdAt', 'updatedAt']
         },
@@ -21,11 +21,9 @@ const tweetController = {
           { model: Reply, attributes: ['UserId'] }
         ]
       })
-      await tweets.map(tweet => ({
-        ...Object.keys(tweet.dataValues).reduce((result, key) => {
-          result[key] = tweet[key]
-          return result
-        }, {}),
+      
+      tweets = await tweets.map(tweet => ({
+        ...tweet.dataValues,
         isLiked: tweet.Likes.map(l => l.UserId).includes(userId),
         repliedCount: tweet.Replies.length,
         LikeCount: tweet.Likes.length,
@@ -71,10 +69,7 @@ const tweetController = {
         return res.status(400).json({ message: 'tweet not exist' })
       }
       tweet = {
-        ...Object.keys(tweet.dataValues).reduce((result, key) => {
-          result[key] = tweet[key]
-          return result
-        }, {}),
+        ...tweet.dataValues,
         isLiked: tweet.Likes.map(l => l.UserId).includes(userId),
         repliedCount: tweet.Replies.length,
         LikeCount: tweet.Likes.length,

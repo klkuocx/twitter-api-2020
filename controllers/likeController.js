@@ -16,11 +16,9 @@ const likeController = {
       if (tweet.UserId === userId) {
         return res.status(400).json({ message: "Don't be narcissism" })
       }
-      const { like, created } = await Like.findOrCreate({
+      const [ like, created ] = await Like.findOrCreate({
         where: { TweetId: Number(tweetId), UserId: Number(userId) },
         default: { UserId: Number(userId) }
-      }).spread((like, created) => {
-        return { like, created }
       })
       if (!created) {
         return res.status(400).json({ message: 'Already Liked' })
