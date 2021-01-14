@@ -14,7 +14,12 @@ const logger = require('morgan')
 const app = express()
 const port = process.env.PORT
 const server = require('http').createServer(app)
-const io = require('socket.io')(server)
+const io = require('socket.io')(server, {
+  cors: {
+    origin: "*",
+    credentials: true
+  }
+})
 
 app.use(logger('dev'))
 app.use(cors())
