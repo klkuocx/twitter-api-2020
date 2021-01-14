@@ -5,52 +5,51 @@ const Followship = db.Followship
 const User = db.User
 
 const followshipController = {
-  follow: (req, res, next) => {
-    const followerId = Number(helpers.getUser(req).id)
-    const followingId = Number(req.body.id)
-    User.findByPk(followingId)
-      .then(user => {
-        if (!user || user.role === 'admin') {
-          return res.status(400).json({ message: 'this user not exist' })
-        }
-        if (followerId === followingId) {
-          return res.status(400).json({ message: "Don't be narcissism" })
-        }
-        return Followship.findOrCreate({
-          where: { followingId, followerId },
-          default: { followingId, followerId }
-        }).spread((follow, created) => {
-          if (!created) {
-            return res.status(400).json({ message: 'Already Followed' })
-          }
-          return res.json({ message: `follow user ${followingId} successfully`, follow })
-        })
+  follow: async (req, res, next) => {
+    try {
+      const followerId = Number(helpers.getUser(req).id)
+      const followingId = Number(req.body.id)
+      let user = await User.findByPk(followingId)
+      if (!user || user.role === 'admin') {
+        return res.status(400).json({ message: 'this user not exist' })
+      }
+      if (followerId === followingId) {
+        return res.status(400).json({ message: "Don't be narcissism" })
+      }
+      let [ follow, created ] = await Followship.findOrCreate({
+        where: { followingId, followerId },
+        default: { followingId, followerId }
       })
-      .catch(next)
+      if (!created) {
+        return res.status(400).json({ message: 'Already Followed' })
+      }
+      return res.json({ message: `follow user ${followingId} successfully`, follow })
+    } catch (err) {
+      next()
+    }
   },
-  unfollow: (req, res, next) => {
-    const followerId = helpers.getUser(req).id
-    const followingId = req.params.followingId
-    User.findByPk(followingId)
-      .then(user => {
-        if (!user || user.role === 'admin') {
-          return res.status(400).json({ message: 'this user not exist' })
+  unfollow: async (req, res, next) => {
+    try {
+      const followerId = helpers.getUser(req).id
+      const followingId = req.params.followingId
+      const user = await User.findByPk(followingId)
+      if (!user || user.role === 'admin') {
+        return res.status(400).json({ message: 'this user not exist' })
+      }
+      const following = await Followship.findOne({
+        where: {
+          followerId: followerId,
+          followingId: followingId
         }
-        return Followship.findOne({
-          where: {
-            followerId: followerId,
-            followingId: followingId
-          }
-        }).then(following => {
-          if (!following) {
-            return res.status(400).json({ message: 'followship not exist' })
-          }
-          return following.destroy().then(unfollow => {
-            res.json({ message: `unfollow user ${followingId} successfully`, unfollow })
-          })
-        })
       })
-      .catch(next)
+      if (!following) {
+        return res.status(400).json({ message: 'followship not exist' })
+      }
+      const unfollow = await following.destroy()
+      return res.json({ message: `unfollow user ${followingId} successfully`, unfollow })
+    } catch (err) {
+      next()
+    }
   }
 }
 
