@@ -57,15 +57,16 @@ module.exports = io => {
       })
     })
 
-    // // user send message
-    // socket.on('clientSendMessage', message => {
-    //   if (!message) return
-    //   io.in('public room').emit('serverSendMessage', {
-    //     user: user,
-    //     message: message,
-    //     timestamp: new Date()
-    //   })
-    // })
+    // when user send message
+    socket.on('sendMessage', payload => {
+      const { userId, room, message } = payload
+      if (!message.trim()) return
+      socket.broadcast.to(room).emit('sendMessage', {
+        userId: userId,
+        content: message.trim(),
+        createdAt: new Date()
+      })
+    })
 
     // // user is typing
     // socket.on('typing', room => {
