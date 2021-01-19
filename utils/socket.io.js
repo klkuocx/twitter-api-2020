@@ -10,11 +10,11 @@ module.exports = io => {
   //   const user = socket.request.user
   //   console.log(`user(socket.id: ${socket.id}, userId: ${user.id}, name: ${user.name}) is connecting`)
   io.on('connection', socket => {
-    console.log(`======Socket.IO======`)
-    console.log(`socket.id: ${socket.id} is connecting...`)
-    console.log(`socket.conn: ${socket.conn}`)
-    console.log(`socket.request: ${socket.request}`)
-    console.log(`======Socket.IO======`)
+    console.info(`======Socket.IO======`)
+    console.info(`socket.id: ${socket.id} is connecting...`)
+    console.info(`socket.conn: ${socket.conn}`)
+    console.info(`socket.request: ${socket.request}`)
+    console.info(`======Socket.IO======`)
 
     //  when user is online
     socket.on('online', userId => {
@@ -25,7 +25,7 @@ module.exports = io => {
       } else {
         onlineUsers[userId] = new Set([socket.id])
       }
-      console.log(`add socket in onlineUser[${userId}]`, onlineUsers)
+      console.info(`add socket in onlineUser[${userId}]`, onlineUsers)
 
       // update onlineUsers to clients
       io.emit('onlineUsers', {
