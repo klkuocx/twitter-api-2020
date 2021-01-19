@@ -16,7 +16,9 @@ const port = process.env.PORT
 const server = require('http').createServer(app)
 const io = require('socket.io')(server, {
   cors: {
-    origin: "*",
+    origin: ['http://localhost:8080', 'https://socketserve.io', 'https://russelllin7789.github.io'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['my-custom-header', 'Authorization', 'Content-Type', 'X-Requested-With'],
     credentials: true
   }
 })
@@ -27,12 +29,12 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(passport.initialize())
 
+require('./routes')(app)
+require('./utils/socket.io.js')(io)
+
 // run and listen to server 
 server.listen(port, () => {
   console.log(`KRLL Twitter API listening on port:${port}`)
 })
-
-require('./routes')(app)
-require('./utils/socket.io')(io)
 
 module.exports = app
