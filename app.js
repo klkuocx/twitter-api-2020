@@ -16,7 +16,7 @@ const port = process.env.PORT
 const server = require('http').createServer(app)
 const io = require('socket.io')(server, {
   cors: {
-    origin: ['http://localhost:8080', 'https://socketserve.io', 'https://russelllin7789.github.io'],
+    origin: ['http://localhost:8080', 'https://socketserve.io', 'https://amritb.github.io/socketio-client-tool/', 'https://russelllin7789.github.io'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['my-custom-header', 'Authorization', 'Content-Type', 'X-Requested-With'],
     credentials: true
