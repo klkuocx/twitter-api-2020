@@ -68,9 +68,10 @@ module.exports = io => {
       })
     })
 
-    // // user is typing
-    // socket.on('typing', room => {
-    //   socket.broadcast.to(room).emit('typing', `user: ${user.name} is typing`)
-    // })
+    // when user is typing
+    socket.on('typing', payload => {
+      const { userId, room } = payload
+      socket.broadcast.to(room).emit('typing', `user: ${userId} is typing`)
+    })
   })
 }
