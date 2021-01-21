@@ -15,8 +15,11 @@ const chatController = {
 
   getChatRoom: async (req, res, next) => {
     try {
-      // get users in chatroom
-      // get messages in chatroom
+      const { roomId } = req.params
+      // get users & messages in chatroom
+      const usersInChatRoom = await ChatRoom.getUsers(roomId)
+      const messagesHistory = await ChatMessage.getHistory(roomId)
+      res.json({ message: 'get chatroom data successfully', users: usersInChatRoom, messages: messagesHistory })
     } catch (err) { next(err) }
   },
 
