@@ -25,7 +25,21 @@ const chatController = {
 
   postMessage: async (req, res, next) => {
     try {
+      const { roomId } = req.params
+      const content = req.body.content.trim()
+      const currentUserId = req.user.id
+      // check content exist
+      if (!content) {
+        return res.status(400).json('content do not exist')
+      }
+      // check room exist
+      const room = await Room.getRoom(roomId)
+      if (!room) {
+        return res.status(400).json('chatroom do not exist')
+      }
       // post message
+      const messagePost = await ChatMessage.postMessage(roomId, content, currentUserId)
+      res.json({ message: `save user(${currentUserId})'s message in room(${roomId})`, messagePost })
     } catch (err) { next(err) }
   },
 
