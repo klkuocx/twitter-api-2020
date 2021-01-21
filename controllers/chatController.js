@@ -1,5 +1,5 @@
 // models
-const { User, Room, ChatRoom, ChatMessage } = require('../models')
+const { Room, ChatRoom, ChatMessage } = require('../models')
 
 const chatController = {
   initiateChatRoom: async (req, res, next) => {
