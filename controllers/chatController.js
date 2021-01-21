@@ -45,7 +45,16 @@ const chatController = {
 
   markMessageRead: async (req, res, next) => {
     try {
+      const { roomId } = req.params
+      const currentUserId = req.user.id
+      // check room exist
+      const room = await Room.getRoom(roomId)
+      if (!room) {
+        return res.status(400).json('chatroom do not exist')
+      }
       // mark messages read
+      const result = await ChatMessage.markMessageRead(roomId, currentUserId)
+      res.json({ message: 'mark messages read successfully', result })
     } catch (err) { next(err) }
   }
 }
