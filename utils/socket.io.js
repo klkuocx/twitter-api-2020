@@ -35,7 +35,11 @@ module.exports = io => {
         countOfUsers: Object.keys(onlineUsers).length
       })
       // send message to all users in public room except sender
-      socket.broadcast.to('publicRoom').emit('joinRoom', `user: ${userId} is online`)
+      socket.broadcast.to('publicRoom').emit('joinRoom', {
+        user: currentUser,
+        content: `user: ${currentUser.name} is online`,
+        createdAt: new Date()
+      })
     })
 
     // disconnect and leave public room
