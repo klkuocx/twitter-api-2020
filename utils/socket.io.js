@@ -35,7 +35,7 @@ module.exports = io => {
         countOfUsers: Object.keys(onlineUsers).length
       })
       // send message to all users in public room except sender
-      socket.broadcast.to('publicRoom').emit('joinRoom', {
+      socket.in('publicRoom').emit('joinRoom', {
         user: currentUser,
         content: `user: ${currentUser.name} is online`,
         createdAt: new Date()
@@ -56,7 +56,7 @@ module.exports = io => {
         })
 
         // send message to all users in public room except sender
-        socket.broadcast.to('publicRoom').emit('leaveRoom', {
+        socket.in('publicRoom').emit('leaveRoom', {
           user: currentUser,
           content: `user: ${currentUser.name} is offline`,
           createdAt: new Date()
@@ -68,7 +68,7 @@ module.exports = io => {
     socket.on('sendMessage', payload => {
       const { room, message } = payload
       if (!message.trim()) return
-      socket.broadcast.to(room).emit('sendMessage', {
+      socket.in(room).emit('sendMessage', {
         user: currentUser,
         content: message.trim(),
         createdAt: new Date()
@@ -77,7 +77,7 @@ module.exports = io => {
 
     // when user is typing
     socket.on('typing', room => {
-      socket.broadcast.to(room).emit('typing', `user: ${currentUser.name} is typing`)
+      socket.in(room).emit('typing', `user: ${currentUser.name} is typing`)
     })
   })
 }
